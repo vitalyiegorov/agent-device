@@ -260,3 +260,64 @@ test('uninstall resolves, removes and invalidates on the device readiness return
     signal,
   );
 });
+
+test.each([false, true])(
+  'reinstall removes data before the replacement is materialized with a hosted installer: %s',
+  async (hosted) => {
+    const events: string[] = [];
+    native.uninstallAndroidPackage.mockImplementation(async () => {
+      events.push('uninstall');
+    });
+    native.installAndroidArtifact.mockImplementation(async () => {
+      events.push('install');
+      return 'com.example.app';
+    });
+    const host = hostFixture({
+      withInvalidatedAppResolutionCache: async (_device, operation) => {
+        events.push('invalidate-before');
+        try {
+          return await operation();
+        } finally {
+          events.push('invalidate-after');
+        }
+      },
+      prepareArtifact: async () => {
+        events.push('materialize');
+        return {
+          installablePath: '/tmp/new.apk',
+          cleanup: async () => {
+            events.push('cleanup');
+          },
+        };
+      },
+    });
+    const operations = createAndroidAppDeploymentOperations({
+      host,
+      device,
+      signal: new AbortController().signal,
+      ...(hosted
+        ? {
+            install: async () => {
+              events.push('install');
+              return { packageName: 'com.example.app' };
+            },
+          }
+        : {}),
+    });
+    expect(
+      await operations.deployApp!({
+        app: 'com.example.app',
+        appPath: '/tmp/new.apk',
+        replaceExisting: true,
+      }),
+    ).toEqual({ packageName: 'com.example.app', launchTarget: 'com.example.app' });
+    expect(events).toEqual([
+      'invalidate-before',
+      'uninstall',
+      'materialize',
+      'install',
+      'cleanup',
+      'invalidate-after',
+    ]);
+  },
+);

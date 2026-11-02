@@ -1,5 +1,6 @@
 import type {
   AppDeploymentInput,
+  AppDeploymentInstaller,
   AppDeploymentResult,
   AppDeploymentRuntimeOperations,
   AppUninstallInput,
@@ -45,17 +46,19 @@ export function createAndroidAppDeploymentOperations(params: {
   host: PlatformRuntimeHost;
   device: DeviceInfo;
   signal: AbortSignal;
+  install?: AppDeploymentInstaller;
 }): Partial<AppDeploymentRuntimeOperations> {
   const { host, device, signal } = params;
+  const install = params.install;
   const facts = androidAppDeploymentFacts(device);
   if (!facts.deployApp.available) return Object.freeze({});
   return Object.freeze({
     deployApp: async (input: AppDeploymentInput) =>
-      await deployAndroidApp(host, device, input, signal),
+      await deployAndroidApp(host, device, input, signal, install),
     materializeAppSource: async (input: MaterializeAppSourceInput) =>
       await host.androidDeployment.prepareArtifact(input, { signal }),
     deployMaterializedApp: async (input: DeployMaterializedAppInput) =>
-      await deployPreparedAndroidApp(host, device, input, signal),
+      await deployPreparedAndroidApp(host, device, input, signal, install),
     sendPushNotification: async (input: PushNotificationInput) =>
       await pushAndroidNotification(host, device, input, signal),
     uninstallApp: async (input: AppUninstallInput) =>
@@ -96,6 +99,7 @@ async function deployAndroidApp(
   device: DeviceInfo,
   input: AppDeploymentInput,
   signal: AbortSignal,
+  install?: AppDeploymentInstaller,
 ): Promise<AppDeploymentResult> {
   if (input.replaceExisting) {
     // Reinstall resolves its fuzzy target during uninstall. Keep the old whole-operation
@@ -113,7 +117,9 @@ async function deployAndroidApp(
           { source: { kind: 'path', path: input.appPath } },
           { resolveIdentity: false, signal },
         );
-        await installAndroidArtifact(host, device, artifact.installablePath, undefined, signal);
+        if (install) await install(artifact, signal);
+        else
+          await installAndroidArtifact(host, device, artifact.installablePath, undefined, signal);
         return { packageName, launchTarget: packageName };
       } finally {
         await artifact?.cleanup();
@@ -133,13 +139,15 @@ async function deployAndroidApp(
       { source: { kind: 'path', path: input.appPath } },
       { resolveIdentity: true, signal },
     );
-    const packageName = await installAndroidArtifact(
-      host,
-      device,
-      artifact.installablePath,
-      artifact.packageName,
-      signal,
-    );
+    const packageName = install
+      ? (await install(artifact, signal)).packageName
+      : await installAndroidArtifact(
+          host,
+          device,
+          artifact.installablePath,
+          artifact.packageName,
+          signal,
+        );
     // Plain install has historically succeeded even when the device cannot report the
     // installed package identity. Source installation is stricter because its response
     // contract promises an identity after materialization.
@@ -159,14 +167,17 @@ async function deployPreparedAndroidApp(
   device: DeviceInfo,
   input: DeployMaterializedAppInput,
   signal: AbortSignal,
+  install?: AppDeploymentInstaller,
 ): Promise<AppDeploymentResult> {
-  const packageName = await installAndroidArtifact(
-    host,
-    device,
-    input.artifact.installablePath,
-    input.artifact.packageName,
-    signal,
-  );
+  const packageName = install
+    ? (await install(input.artifact, signal)).packageName
+    : await installAndroidArtifact(
+        host,
+        device,
+        input.artifact.installablePath,
+        input.artifact.packageName,
+        signal,
+      );
   if (!packageName) {
     throw new AppError(
       'COMMAND_FAILED',
