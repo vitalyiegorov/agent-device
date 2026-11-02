@@ -24,6 +24,8 @@ test('snapshot bridge preparation is cold-once, atomic, and invalidates corrupt 
   await (await import('@agent-device/host-kit/host-file')).ensureHostDirectory(sourceRoot);
   await writeFile(sourceFile, 'native source v1');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeRuntime.m'), 'native runtime v1');
+  await writeFile(path.join(sourceRoot, 'SnapshotBridgeRequest.h'), 'native runtime v1');
+  await writeFile(path.join(sourceRoot, 'SnapshotBridgeRequest.m'), 'native runtime v1');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeRuntime.h'), 'native header v1');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeCapture.h'), 'native header v1');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeCapture.m'), 'native header v1');
@@ -199,6 +201,8 @@ test('concurrent snapshot bridge preparation publishes one cache entry', async (
   await (await import('@agent-device/host-kit/host-file')).ensureHostDirectory(sourceRoot);
   await writeFile(path.join(sourceRoot, 'SnapshotBridge.m'), 'native source');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeRuntime.m'), 'native runtime');
+  await writeFile(path.join(sourceRoot, 'SnapshotBridgeRequest.h'), 'native runtime');
+  await writeFile(path.join(sourceRoot, 'SnapshotBridgeRequest.m'), 'native runtime');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeRuntime.h'), 'native header');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeCapture.h'), 'native header');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeCapture.m'), 'native header');
@@ -238,6 +242,8 @@ test('an aborted cache waiter does not cancel an independent preparation', async
   await (await import('@agent-device/host-kit/host-file')).ensureHostDirectory(sourceRoot);
   await writeFile(path.join(sourceRoot, 'SnapshotBridge.m'), 'native source');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeRuntime.m'), 'native runtime');
+  await writeFile(path.join(sourceRoot, 'SnapshotBridgeRequest.h'), 'native runtime');
+  await writeFile(path.join(sourceRoot, 'SnapshotBridgeRequest.m'), 'native runtime');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeRuntime.h'), 'native header');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeCapture.h'), 'native header');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeCapture.m'), 'native header');
@@ -291,6 +297,8 @@ test('a bridge build that failed is reported over a cache lock that could not be
   await (await import('@agent-device/host-kit/host-file')).ensureHostDirectory(sourceRoot);
   await writeFile(path.join(sourceRoot, 'SnapshotBridge.m'), 'native source');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeRuntime.m'), 'native runtime');
+  await writeFile(path.join(sourceRoot, 'SnapshotBridgeRequest.h'), 'native runtime');
+  await writeFile(path.join(sourceRoot, 'SnapshotBridgeRequest.m'), 'native runtime');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeRuntime.h'), 'native header');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeCapture.h'), 'native header');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeCapture.m'), 'native header');
@@ -344,6 +352,8 @@ test('a compile exec killed at its budget reports the bridge build, not the exec
   await (await import('@agent-device/host-kit/host-file')).ensureHostDirectory(sourceRoot);
   await writeFile(path.join(sourceRoot, 'SnapshotBridge.m'), 'native source');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeRuntime.m'), 'native runtime');
+  await writeFile(path.join(sourceRoot, 'SnapshotBridgeRequest.h'), 'native runtime');
+  await writeFile(path.join(sourceRoot, 'SnapshotBridgeRequest.m'), 'native runtime');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeRuntime.h'), 'native header');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeCapture.h'), 'native header');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeCapture.m'), 'native header');

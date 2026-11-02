@@ -34,6 +34,8 @@ test('the Simulator AX source returns raw acquisition facts and discloses unsupp
   await (await import('@agent-device/host-kit/host-file')).ensureHostDirectory(sourceRoot);
   await writeFile(path.join(sourceRoot, 'SnapshotBridge.m'), 'native source');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeRuntime.m'), 'native runtime');
+  await writeFile(path.join(sourceRoot, 'SnapshotBridgeRequest.h'), 'native runtime');
+  await writeFile(path.join(sourceRoot, 'SnapshotBridgeRequest.m'), 'native runtime');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeRuntime.h'), 'native header');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeCapture.h'), 'native header');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeCapture.m'), 'native header');
@@ -136,6 +138,8 @@ test('the Simulator AX source refuses a tree that ends at content another proces
   await (await import('@agent-device/host-kit/host-file')).ensureHostDirectory(sourceRoot);
   for (const name of [
     'SnapshotBridge.m',
+    'SnapshotBridgeRequest.h',
+    'SnapshotBridgeRequest.m',
     'SnapshotBridgeRuntime.m',
     'SnapshotBridgeRuntime.h',
     'SnapshotBridgeCapture.h',
@@ -188,6 +192,8 @@ test('a capture reports a cold preparation instead of spending its deadline on i
   await (await import('@agent-device/host-kit/host-file')).ensureHostDirectory(sourceRoot);
   await writeFile(path.join(sourceRoot, 'SnapshotBridge.m'), 'native source');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeRuntime.m'), 'native runtime');
+  await writeFile(path.join(sourceRoot, 'SnapshotBridgeRequest.h'), 'native runtime');
+  await writeFile(path.join(sourceRoot, 'SnapshotBridgeRequest.m'), 'native runtime');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeRuntime.h'), 'native header');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeCapture.h'), 'native header');
   await writeFile(path.join(sourceRoot, 'SnapshotBridgeCapture.m'), 'native header');
@@ -232,6 +238,8 @@ test('the Simulator AX source learns a hint only from a validated acquisition', 
   await (await import('@agent-device/host-kit/host-file')).ensureHostDirectory(sourceRoot);
   for (const name of [
     'SnapshotBridge.m',
+    'SnapshotBridgeRequest.h',
+    'SnapshotBridgeRequest.m',
     'SnapshotBridgeRuntime.m',
     'SnapshotBridgeRuntime.h',
     'SnapshotBridgeCapture.h',
@@ -295,6 +303,8 @@ test('the Simulator AX source forgets a hint once a default-depth probe-back is 
   await (await import('@agent-device/host-kit/host-file')).ensureHostDirectory(sourceRoot);
   for (const name of [
     'SnapshotBridge.m',
+    'SnapshotBridgeRequest.h',
+    'SnapshotBridgeRequest.m',
     'SnapshotBridgeRuntime.m',
     'SnapshotBridgeRuntime.h',
     'SnapshotBridgeCapture.h',
@@ -481,6 +491,8 @@ test('the Simulator AX source follows the shared hint contract', async () => {
   await (await import('@agent-device/host-kit/host-file')).ensureHostDirectory(sourceRoot);
   for (const name of [
     'SnapshotBridge.m',
+    'SnapshotBridgeRequest.h',
+    'SnapshotBridgeRequest.m',
     'SnapshotBridgeRuntime.m',
     'SnapshotBridgeRuntime.h',
     'SnapshotBridgeCapture.h',
@@ -779,6 +791,8 @@ test('the Simulator AX source refuses a window whose coordinate space it cannot 
   await (await import('@agent-device/host-kit/host-file')).ensureHostDirectory(sourceRoot);
   for (const name of [
     'SnapshotBridge.m',
+    'SnapshotBridgeRequest.h',
+    'SnapshotBridgeRequest.m',
     'SnapshotBridgeRuntime.m',
     'SnapshotBridgeRuntime.h',
     'SnapshotBridgeCapture.h',
