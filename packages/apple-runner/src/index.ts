@@ -37,6 +37,7 @@ export {
   buildRunnerSequenceCommand,
   parseRunnerSequenceResult,
   type RunnerCommand,
+  type RunnerSnapshotBridgeRequest,
 } from './runner-contract.ts';
 export { isRunnerMainThreadTimeoutError } from './runner-error-classification.ts';
 export {

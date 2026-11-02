@@ -462,6 +462,8 @@ extension RunnerTests {
       return executeUptime()
     case .appState:
       return executeAppState(command: command)
+    case .snapshotBridge:
+      return executeSnapshotBridge(command: command)
     case .pasteboardWrite:
       return executePasteboardWrite(command: command)
     case .activate:

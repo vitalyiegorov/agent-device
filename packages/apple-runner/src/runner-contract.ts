@@ -111,6 +111,8 @@ export type RunnerCommand = {
     // The session app's XCUIApplication.state by name. A lifecycle read: it skips the activation
     // preflight, so it reports the state the app is in rather than the one a repair leaves.
     | 'appState'
+    // Reads the Simulator AX bridge tree in the runner process, off its journal and command queue.
+    | 'snapshotBridge'
     // Sets the device's general pasteboard from the runner's own process: a simulator's
     // `simctl pbcopy` only promises its data from a process that exits before anything reads it.
     | 'pasteboardWrite'
@@ -163,6 +165,25 @@ export type RunnerCommand = {
   inlineScreenshot?: boolean;
   synthesized?: boolean;
   steps?: RunnerSequenceStep[];
+  snapshotBridge?: RunnerSnapshotBridgeRequest;
+};
+
+/**
+ * One request to the Simulator AX bridge reader that the runner serves. `target` names the foreground
+ * process of `appBundleId`; `describe` reads its tree under the guest bridge's own bounds, and refuses a
+ * process other than `expectedPid` and `expectedProcessStartTime` as a stale target.
+ */
+export type RunnerSnapshotBridgeRequest = {
+  verb: 'target' | 'describe';
+  requestId: string;
+  generation?: string;
+  expectedPid?: number;
+  expectedProcessStartTime?: string;
+  maxDepth?: number;
+  maxNodes?: number;
+  maxDurationMs?: number;
+  maxResponseBytes?: number;
+  nativeLevelsHint?: number;
 };
 
 /**
