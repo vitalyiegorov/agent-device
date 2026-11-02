@@ -16,21 +16,29 @@ export type SnapshotSourceLimits = Readonly<{
   maxDurationMs: number;
 }>;
 
-export type SnapshotSourceTarget = Readonly<{
-  simulator: SimulatorAddress;
-  runtime: string;
+/** The app generation a bridge read is planned against, whichever process reads the tree. */
+export type SnapshotBridgeTarget = Readonly<{
   pid: number;
   generation: string;
   targetId?: string;
   processStartTime?: string;
 }>;
 
-export type SnapshotSourceRequest = Readonly<{
-  target: SnapshotSourceTarget;
+/** A target the host reaches through its own guest bridge process on a local Simulator. */
+export type SnapshotSourceTarget = SnapshotBridgeTarget &
+  Readonly<{
+    simulator: SimulatorAddress;
+    runtime: string;
+  }>;
+
+export type SnapshotBridgeSourceRequest<Target extends SnapshotBridgeTarget> = Readonly<{
+  target: Target;
   hint: CaptureHint;
   limits?: Partial<SnapshotSourceLimits>;
   signal?: AbortSignal;
 }>;
+
+export type SnapshotSourceRequest = SnapshotBridgeSourceRequest<SnapshotSourceTarget>;
 
 export type SnapshotSourceSuccess = Readonly<{
   stage: 'acquired';
