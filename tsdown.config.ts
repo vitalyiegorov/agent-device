@@ -98,6 +98,7 @@ export default defineConfig({
     alwaysBundle: [/^@agent-device\//],
     onlyBundle: [
       '@limrun/api',
+      '@xmldom/xmldom',
       'agent-base',
       'b4a',
       'debug',
@@ -112,6 +113,7 @@ export default defineConfig({
       'jpeg-js',
       'ms',
       'pend',
+      'plist',
       'pngjs',
       'proxy-from-env',
       'streamx',
@@ -121,6 +123,7 @@ export default defineConfig({
       'undici',
       'undici-types',
       'ws',
+      'xmlbuilder',
       'yaml',
       'yauzl',
     ],
