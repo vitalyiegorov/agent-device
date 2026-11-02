@@ -1,3 +1,5 @@
+import type { LeaseRegistry } from '../../../resources/lease-registry.ts';
+import { inspectSessionLeaseRetainedOnClose } from '../../lease-lifecycle.ts';
 import type { CloseApplicationFinalizationResult } from '@agent-device/contracts/application-lifecycle-runtime';
 import type { TargetShutdownResult } from '@agent-device/contracts/device';
 import type { DaemonRequest } from '../../../core/daemon-request.ts';
@@ -36,6 +38,7 @@ export async function runSessionCloseTeardown(params: {
   ref: SessionRef;
   logPath: string;
   sessionStore: SessionStore;
+  leaseRegistry: LeaseRegistry;
   lifecycle: CloseRuntime | CloseRuntimeWithRuntimeHintClear;
   clearRuntimeHints?: RuntimeHintClearOperation;
   cleanupFailures: SessionCleanupFailure[];
@@ -78,7 +81,9 @@ export async function runSessionCloseTeardown(params: {
     device: session.device,
     shutdownRequested: req.flags?.shutdown === true,
     hasScreenRecording: Boolean(session.screenRecording),
-    hasLease: Boolean(session.lease),
+    leaseWillEnd:
+      Boolean(session.lease) &&
+      !inspectSessionLeaseRetainedOnClose({ session, leaseRegistry: params.leaseRegistry }),
   });
   const configuredRuntimeHints = sessionStore.getRuntimeHints(sessionName);
   const resourceStops = sessionResourceStopSteps({

@@ -16,6 +16,6 @@ export type PlatformResourceCleanup = Readonly<{
     device: DeviceInfo;
     shutdownRequested: boolean;
     hasScreenRecording: boolean;
-    hasLease: boolean;
+    leaseWillEnd: boolean;
   }): boolean;
 }>;

@@ -142,7 +142,7 @@ test.each([
         device,
         shutdownRequested: false,
         hasScreenRecording: false,
-        hasLease: false,
+        leaseWillEnd: false,
       });
       expect(finalizations).toEqual([
         expect.objectContaining({ retainRunner: retainExecutionHost, shutdownTarget: false }),
@@ -204,43 +204,47 @@ test('close hands the session app and surface to the platform finalization', asy
   expect(sessionStore.get(sessionName)).toBeUndefined();
 });
 
-test('close of a leased session tells the platform that a lease holds the device', async () => {
-  const sessionStore = makeSessionStore();
-  const sessionName = 'ios-leased-simulator-session';
-  const leaseRegistry = new LeaseRegistry();
-  const lease = leaseRegistry.allocateLease({
-    tenantId: 'tenant-a',
-    runId: 'run-1',
-    leaseBackend: 'ios-simulator',
-    deviceKey: 'ios:sim-1',
-    clientId: 'client-a',
-  });
-  publishSession(sessionStore, sessionName, IOS_SIMULATOR, {
-    lease: {
-      leaseId: lease.leaseId,
-      tenantId: lease.tenantId,
-      runId: lease.runId,
-      leaseBackend: lease.backend,
-      deviceKey: lease.deviceKey,
-      clientId: lease.clientId,
-      expiresAt: lease.expiresAt,
-    },
-  });
+test.each([false, true])(
+  'close reports whether a lease with retainOnClose=%s will end',
+  async (retainOnClose) => {
+    const sessionStore = makeSessionStore();
+    const sessionName = 'ios-leased-simulator-session';
+    const leaseRegistry = new LeaseRegistry();
+    const lease = leaseRegistry.allocateLease({
+      tenantId: 'tenant-a',
+      runId: 'run-1',
+      leaseBackend: 'ios-simulator',
+      deviceKey: 'ios:sim-1',
+      clientId: 'client-a',
+      retainOnClose,
+    });
+    publishSession(sessionStore, sessionName, IOS_SIMULATOR, {
+      lease: {
+        leaseId: lease.leaseId,
+        tenantId: lease.tenantId,
+        runId: lease.runId,
+        leaseBackend: lease.backend,
+        deviceKey: lease.deviceKey,
+        clientId: lease.clientId,
+        expiresAt: lease.expiresAt,
+      },
+    });
 
-  const { response, finalizations, platformResourceCleanup } = await closeSession({
-    sessionStore,
-    sessionName,
-    retainExecutionHost: false,
-    leaseRegistry,
-  });
+    const { response, finalizations, platformResourceCleanup } = await closeSession({
+      sessionStore,
+      sessionName,
+      retainExecutionHost: retainOnClose,
+      leaseRegistry,
+    });
 
-  expect(response?.ok).toBe(true);
-  expect(platformResourceCleanup.retainExecutionHostAfterClose).toHaveBeenCalledWith(
-    expect.objectContaining({ hasLease: true }),
-  );
-  expect(finalizations).toEqual([expect.objectContaining({ retainRunner: false })]);
-  expect(sessionStore.get(sessionName)).toBeUndefined();
-});
+    expect(response?.ok).toBe(true);
+    expect(platformResourceCleanup.retainExecutionHostAfterClose).toHaveBeenCalledWith(
+      expect.objectContaining({ leaseWillEnd: !retainOnClose }),
+    );
+    expect(finalizations).toEqual([expect.objectContaining({ retainRunner: retainOnClose })]);
+    expect(sessionStore.get(sessionName)).toBeUndefined();
+  },
+);
 
 test('an app-only close terminates the app without finalizing or ending the session', async () => {
   const sessionStore = makeSessionStore();

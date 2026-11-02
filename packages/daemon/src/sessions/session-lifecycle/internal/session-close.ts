@@ -363,6 +363,7 @@ async function runCloseTeardownAndRelease(params: {
   const { address: sessionName } = ref;
   const cleanupFailures: SessionCleanupFailure[] = [];
   const { platformCloseError, saveScriptError, shutdownResult } = await runSessionCloseTeardown({
+    leaseRegistry,
     req,
     ref,
     logPath,
