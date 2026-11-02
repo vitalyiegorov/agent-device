@@ -864,6 +864,9 @@ importers:
         specifier: workspace:*
         version: link:../platform-android
     devDependencies:
+      '@agent-device/platform-apple':
+        specifier: workspace:*
+        version: link:../platform-apple
       '@limrun/api':
         specifier: ^0.68.1
         version: 0.68.1(supports-color@7.2.0)

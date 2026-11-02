@@ -11,6 +11,7 @@ export type {
   AppleMacOsHostProvider,
   ApplePlistProvider,
   AppleToolProvider,
+  AppleToolExecOptions,
   AppleToolSubcommandExecutor,
 } from './core/tool-provider.ts';
 
