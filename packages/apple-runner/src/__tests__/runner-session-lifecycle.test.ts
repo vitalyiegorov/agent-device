@@ -339,7 +339,7 @@ test('shutdown detach moves a handed-off session to stopped without killing its 
   const device = { ...IOS_SIMULATOR, id: 'runner-lifecycle-detach' };
   const session = await ensureRunnerSession(device, {});
   await serveOneCommand(device, session);
-  const runnerPid = session.child.pid;
+  const runnerPid = session.child?.pid;
   assert.ok(runnerPid);
   runnerStateTransitions.length = 0;
 
@@ -606,7 +606,7 @@ test("the handoff releases this daemon's log bookkeeping only after the lease sa
 test('a registered runner whose process died is recycled instead of reused', async () => {
   const device = { ...IOS_SIMULATOR, id: 'runner-lifecycle-dead-process' };
   const first = await ensureRunnerSession(device, {});
-  const firstPid = first.child.pid;
+  const firstPid = first.child?.pid;
   assert.ok(firstPid);
   runnerStateTransitions.length = 0;
 
@@ -621,7 +621,7 @@ test('a registered runner whose process died is recycled instead of reused', asy
   const second = await ensureRunnerSession(device, {});
 
   assert.notEqual(second.sessionId, first.sessionId);
-  assert.equal(second.child.pid, firstPid + 1);
+  assert.equal(second.child?.pid, firstPid + 1);
   assert.equal(first.state, 'stopped');
   assert.deepEqual(runnerStateTransitions, ['draining', 'stopped']);
   assert.deepEqual(readRunnerSessionLiveness(device.id), {

@@ -17,6 +17,7 @@ import {
   classifyRunnerStartupFailure,
   enrichRunnerStartupFailureWithDeviceStates,
   isRunnerCommandProvablyUnwritten,
+  isRunnerForwardingUnavailable,
   isUsbmuxDeviceUnattachedError,
   RUNNER_CACHE_RECOVERY_HINT,
   runnerConnectFailureDetails,
@@ -30,9 +31,10 @@ import {
 } from './runner-contract.ts';
 import type { RunnerSession } from './runner-session-types.ts';
 
-export type RunnerConnectionSession = Pick<
+type RunnerProcessConnectionSession = Pick<
   RunnerSession,
   | 'startupRetryWake'
+  | 'launch'
   | 'child'
   | 'startupDeviceStates'
   | 'testPromise'
@@ -41,6 +43,21 @@ export type RunnerConnectionSession = Pick<
   | 'runnerLogPath'
   | 'state'
 >;
+export type RunnerConnectionSession = Omit<
+  RunnerProcessConnectionSession,
+  'child' | 'testPromise'
+> &
+  Partial<Pick<RunnerProcessConnectionSession, 'child' | 'testPromise'>>;
+
+function runnerProcessExited(session: RunnerConnectionSession | undefined): boolean {
+  return (
+    session?.launch?.exited === true ||
+    (session?.testPromise !== undefined &&
+      session.child?.exitCode !== null &&
+      session.child?.exitCode !== undefined)
+  );
+}
+
 import {
   runnerLaunchLogClassificationDetails,
   runnerSimulatorSetFailureDetails,
@@ -68,7 +85,11 @@ export async function waitForRunner(
 ): Promise<Response> {
   const deadline = Deadline.fromTimeoutMs(timeoutMs);
   const port = endpoint.port;
-  const { resolveRoute, markUsbmuxUnattached } = createRunnerCommandRouteResolver(device, port);
+  const { resolveRoute, markUsbmuxUnattached } = createRunnerCommandRouteResolver(
+    device,
+    port,
+    endpoint.http,
+  );
   let route = await resolveRoute(deadline.remainingMs());
   let lastError: unknown = null;
   // Every attempt posts the command itself, so the loop gives up "before send" only when no
@@ -142,7 +163,7 @@ export async function waitForRunner(
     throw canceledRunnerConnect(commandMayHaveBeenWritten);
   }
 
-  if (session?.child.exitCode !== null && session?.child.exitCode !== undefined) {
+  if (session && runnerProcessExited(session)) {
     throw withRunnerWriteEvidence(
       await buildRunnerEarlyExitError({ session, port, logPath }),
       commandMayHaveBeenWritten,
@@ -231,7 +252,7 @@ async function ensureRunnerAttemptCanStart(params: {
       timeoutMs: params.timeoutMs,
     });
   }
-  if (params.session?.child.exitCode !== null && params.session?.child.exitCode !== undefined) {
+  if (params.session && runnerProcessExited(params.session)) {
     throw await buildRunnerEarlyExitError({
       session: params.session,
       port: params.endpoint.port,
@@ -471,6 +492,7 @@ function buildRunnerConnectError(params: {
       params.launchLogOutput ?? session?.readLogTail?.(RUNNER_EARLY_EXIT_LOG_TAIL_BYTES) ?? '',
     device,
   });
+  if (!launchLogCause && isRunnerForwardingUnavailable(lastError)) return lastError;
   const error = new AppError('COMMAND_FAILED', launchLogCause?.message ?? message, {
     port,
     url,
@@ -497,11 +519,24 @@ function buildRunnerConnectError(params: {
 }
 
 export async function buildRunnerEarlyExitError(params: {
-  session: RunnerConnectionSession;
+  session: RunnerProcessConnectionSession;
   port: number;
   logPath?: string;
 }): Promise<AppError> {
   const { session, port, logPath } = params;
+  if (session.launch) {
+    return new AppError(
+      'COMMAND_FAILED',
+      'Runner did not accept connection (launcher exited early)',
+      {
+        reason: 'runner_process_exited',
+        port,
+        logPath: session.runnerLogPath ?? logPath,
+        output: session.readLogTail?.(RUNNER_EARLY_EXIT_LOG_TAIL_BYTES),
+      },
+      session.launch.failure,
+    );
+  }
   const result = await session.testPromise;
   const message = 'Runner did not accept connection (xcodebuild exited early)';
   // The runner writes its own output file, so the exec result holds nothing for a file-backed
@@ -524,7 +559,7 @@ export async function buildRunnerEarlyExitError(params: {
     // pointing at the request's log would advertise a file that does not contain what is quoted (#2681).
     logPath: session.runnerLogPath ?? logPath,
     xcodebuild: {
-      exitCode: result.exitCode,
+      exitCode: result?.exitCode,
       // One merged file since #2681: the tail is reported under `stderr`, which is where readers
       // already look, next to the file it came from.
       stderr: output,

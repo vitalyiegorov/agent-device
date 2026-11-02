@@ -1,3 +1,12 @@
+export { RUNNER_STARTUP_TIMEOUT_MS } from './runner-startup-transport.ts';
+export async function createLaunchedAppleRunnerProvider(
+  ...args: Parameters<
+    typeof import('./runner-launcher-provider.ts').createLaunchedAppleRunnerProvider
+  >
+) {
+  const { createLaunchedAppleRunnerProvider } = await import('./runner-launcher-provider.ts');
+  return createLaunchedAppleRunnerProvider(...args);
+}
 /**
  * @agent-device/apple-runner - the Apple XCUITest runner client.
  *
@@ -22,6 +31,7 @@ export type {
   IosPhysicalDeviceRunnerControl,
 } from './runner-physical-device.ts';
 export {
+  mintRunnerToken,
   RUNNER_READY_PREFLIGHT_TIMEOUT_MS,
   SCROLL_KEYBOARD_OCCLUDES_SURFACE_RUNNER_CODE,
   buildRunnerSequenceCommand,
@@ -369,3 +379,7 @@ export async function restoreLegacyXctestDeviceSetRedirect(
     await import('./legacy-xctest-device-set.ts');
   await restore(...args);
 }
+
+export { runnerListenerEnv } from './runner-contract.ts';
+
+export { RUNNER_XCTESTRUN_CAPTURE_OPTIONS } from './runner-artifact-env.ts';

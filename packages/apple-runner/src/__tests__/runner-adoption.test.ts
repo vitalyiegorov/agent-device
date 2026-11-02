@@ -191,7 +191,7 @@ test('adoption succeeds for a live, matching, probe-healthy runner', async () =>
   expect(session).not.toBeNull();
   expect(session?.endpoint.port).toBe(lease.port);
   expect(session?.state).toBe('ready');
-  expect(session?.child.pid).toBe(424242);
+  expect(session?.child?.pid).toBe(424242);
   expect(session?.sessionId).toBe(lease.sessionId);
   expect(session?.xctestrunArtifact?.reason).toBe('adopted_from_lease');
   expect(session?.xctestrunArtifact?.cacheKey).toBe(lease.cacheKey);
@@ -365,7 +365,7 @@ test('adoption accepts a legacy lease whose live pid is runner-shaped', async ()
   const session = await tryAdoptRunnerSessionFromLease(simulator, {});
 
   expect(session?.state).toBe('ready');
-  expect(session?.child.pid).toBe(424242);
+  expect(session?.child?.pid).toBe(424242);
 });
 
 test('a runner for a simulator in a custom simulator set is adopted', async () => {
@@ -492,7 +492,7 @@ test('physical coredevice lane adopts the detached runner and names its lane', a
   const session = await tryAdoptRunnerSessionFromLease(physicalCoreDevice, {});
 
   expect(session?.state).toBe('ready');
-  expect(session?.child.pid).toBe(lease.runnerPid);
+  expect(session?.child?.pid).toBe(lease.runnerPid);
   expect(session?.endpoint.port).toBe(lease.port);
   expect(
     emittedDiagnostics.find((event) => event.phase === 'ios_runner_lease_adopted')?.data,

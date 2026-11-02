@@ -39,6 +39,8 @@ import { clearDeviceTunnelIpCache } from '../runner-command-route.ts';
 import { readRunnerLogTail } from '../runner-io.ts';
 import { resolveRunnerEarlyExitHint, waitForRunner } from '../runner-startup-transport.ts';
 import { mkdtempForTestSync } from './tmp-dir.ts';
+import { makeRunnerSession } from './runner-session-fixtures.ts';
+import { buildFixtureById } from './runner-startup-failure-fixtures.ts';
 
 beforeEach(() => {
   clearDeviceTunnelIpCache();
@@ -59,6 +61,40 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
 });
+
+test.each(['process exit', 'launch log'] as const)(
+  'forwarding failure does not hide a confirmed runner %s',
+  async (failure) => {
+    const session = makeRunnerSession({
+      device: iosSimulator,
+      state: 'starting',
+      readLogTail: () =>
+        failure === 'launch log'
+          ? buildFixtureById('simulator-service-hub-bless-refused').output
+          : '',
+      endpoint: {
+        ...RUNNER_ENDPOINT_FIXTURE,
+        http: { url: 'https://instance.invalid/command' },
+      },
+    });
+    vi.stubGlobal('fetch', async () => {
+      if (failure === 'process exit') session.child!.exitCode = 65;
+      return new Response('Bad Gateway', { status: 502 });
+    });
+    await assert.rejects(
+      waitForRunner(iosSimulator, session.endpoint, { command: 'uptime' }, undefined, 100, session),
+      (error: unknown) => {
+        assert.ok(error instanceof AppError);
+        if (failure === 'process exit') {
+          assert.equal(error.details?.runnerConnectFailureReason, 'xcodebuild_exited_early');
+        } else {
+          assert.equal(error.details?.reason, 'simulator_service_hub_unavailable');
+        }
+        return true;
+      },
+    );
+  },
+);
 
 test('waitForRunner propagates request cancellation without fallback', async () => {
   const signal = AbortSignal.abort();

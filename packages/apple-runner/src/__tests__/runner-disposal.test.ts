@@ -275,7 +275,7 @@ function makeRunnerSession(
 
 function runnerSignals(session: RunnerSession): NodeJS.Signals[] {
   return mockSignalProcessGroupBestEffort.mock.calls
-    .filter(([pid]) => pid === session.child.pid)
+    .filter(([pid]) => pid === session.child?.pid)
     .map(([, signal]) => signal as NodeJS.Signals);
 }
 

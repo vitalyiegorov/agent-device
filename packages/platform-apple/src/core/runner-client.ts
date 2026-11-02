@@ -6,12 +6,17 @@ import { appleRunnerHost } from './runner-host.ts';
  * the real host capabilities from `runner-host.ts`, and the module daemon,
  * platform, and CLI consumers import the host-bound operations from, so every
  * such consumer evaluates after the binding. Runner modules must not reach the
- * host while they evaluate: they load before this module binds it. Types and
- * host-free helpers come from the package façade directly.
+ * host while they evaluate: they load before this module binds it. Import types and
+ * host-free helpers from the package façade when no host binding is needed.
  */
 bindAppleRunnerHost(appleRunnerHost);
 
 export {
+  RUNNER_STARTUP_TIMEOUT_MS,
+  createLaunchedAppleRunnerProvider,
+  mintRunnerToken,
+  runnerListenerEnv,
+  RUNNER_XCTESTRUN_CAPTURE_OPTIONS,
   applyXctestRunnerAppIconFromDerivedPath,
   cleanupRunnerLeasesForOwner,
   detachIosRunnerSessionsForShutdown,

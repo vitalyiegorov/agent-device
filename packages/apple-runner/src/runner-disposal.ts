@@ -12,7 +12,7 @@ import {
 import type { ExecBackgroundResult } from '@agent-device/host-kit/command';
 import { buildRunnerSessionXctestrunPathCleanupPattern } from './runner-artifact-env.ts';
 import { isMacOs, type DeviceInfo } from '@agent-device/kernel/device';
-import { cleanupTempFile } from './runner-io.ts';
+import { cleanupTempFile, flushRunnerLogAppends } from './runner-io.ts';
 import { waitForRunner } from './runner-startup-transport.ts';
 import { withRunnerCommandId, type RunnerCommand } from './runner-contract.ts';
 import {
@@ -71,18 +71,21 @@ export async function disposeRunnerSession(
   let processExitHandled = false;
   if (options.graceful !== false) {
     processExitHandled = await shutdownRunnerSessionGracefully(session);
+  } else if (session.launch) {
+    await session.launch.terminate();
   } else if (isMacOs(session.device)) {
     await interruptMacOsRunnerSessions([session]);
     await cleanupRunnerSessionResources(session, options);
     return;
   } else {
-    await killRunnerProcessTree(session.child.pid, 'SIGTERM');
+    await killRunnerProcessTree(session.child?.pid, 'SIGTERM');
   }
 
   if (!processExitHandled) {
     await waitForRunnerProcessExit(session, options.waitTimeoutMs ?? RUNNER_STOP_WAIT_TIMEOUT_MS);
-    if (isRunnerProcessTreeAlive(session.child.pid)) {
-      await killRunnerProcessTree(session.child.pid, 'SIGKILL');
+    if (session.launch) await session.launch.terminate();
+    if (isRunnerProcessTreeAlive(session.child?.pid)) {
+      await killRunnerProcessTree(session.child?.pid, 'SIGKILL');
     }
   }
   await cleanupRunnerSessionResources(session, options);
@@ -95,6 +98,12 @@ export async function cleanupOwnedIosRunnerLease(deviceId: string): Promise<void
 export async function abortRunnerSessionsAndPrepProcesses(
   activeSessions: readonly RunnerSession[],
 ): Promise<void> {
+  const managed = await Promise.allSettled(
+    activeSessions
+      .filter((session) => session.launch)
+      .map((session) => disposeRunnerSession(session, { graceful: false })),
+  );
+  activeSessions = activeSessions.filter((session) => !session.launch);
   const prepProcesses = runnerPrepProcessChildren();
   const macOsSessions = activeSessions.filter((session) => isMacOs(session.device));
   const otherSessions = activeSessions.filter((session) => !isMacOs(session.device));
@@ -115,6 +124,10 @@ export async function abortRunnerSessionsAndPrepProcesses(
       await cleanupRunnerSessionResources(session);
     }),
   );
+  const failures = managed
+    .filter((result) => result.status === 'rejected')
+    .map((result) => result.reason);
+  if (failures.length) throw new AggregateError(failures, 'Runner launchers failed to terminate');
 }
 
 /**
@@ -155,6 +168,13 @@ async function stopPrepProcessList(
 }
 
 async function shutdownRunnerSessionGracefully(session: RunnerSession): Promise<boolean> {
+  const exited = new AbortController();
+  if (session.launch) {
+    void session.launch.launch.exited.then(
+      () => exited.abort(),
+      () => exited.abort(),
+    );
+  }
   try {
     await waitForRunner(
       session.device,
@@ -164,14 +184,19 @@ async function shutdownRunnerSessionGracefully(session: RunnerSession): Promise<
       } as RunnerCommand),
       undefined,
       RUNNER_SHUTDOWN_TIMEOUT_MS,
+      undefined,
+      session.launch ? exited.signal : undefined,
     );
     return false;
   } catch {
-    if (isMacOs(session.device)) {
+    if (session.launch) {
+      await session.launch.terminate();
+      return false;
+    } else if (isMacOs(session.device)) {
       await interruptMacOsRunnerSessions([session]);
       return true;
     } else {
-      await killRunnerProcessTree(session.child.pid, 'SIGTERM');
+      await killRunnerProcessTree(session.child?.pid, 'SIGTERM');
       return false;
     }
   }
@@ -184,7 +209,7 @@ async function waitForRunnerProcessExit(
   let timeout: NodeJS.Timeout | undefined;
   try {
     const exited = await Promise.race([
-      session.testPromise.then(
+      (session.launch?.launch.exited ?? session.testPromise ?? Promise.resolve()).then(
         () => true,
         () => true,
       ),
@@ -192,7 +217,10 @@ async function waitForRunnerProcessExit(
         timeout = setTimeout(() => resolve(false), waitTimeoutMs);
       }),
     ]);
-    return exited || !isRunnerProcessTreeAlive(session.child.pid);
+    return (
+      exited ||
+      (session.launch ? session.launch.exited : !isRunnerProcessTreeAlive(session.child?.pid))
+    );
   } finally {
     if (timeout) clearTimeout(timeout);
   }
@@ -235,9 +263,21 @@ async function cleanupRunnerSessionResources(
   session: RunnerSession,
   options: Pick<RunnerDisposalOptions, 'leaseLockHeld'> = {},
 ): Promise<void> {
-  await settleOwnedRunnerDeviceState(session, options);
-  cleanupTempFile(session.xctestrunPath);
-  cleanupTempFile(session.jsonPath);
+  if (session.launch) {
+    await session.launch.output;
+    if (session.runnerLogPath)
+      await flushRunnerLogAppends(session.runnerLogPath).catch((error: unknown) => {
+        emitDiagnostic({
+          level: 'warn',
+          phase: 'ios_runner_log_flush_failed',
+          data: { error: String(error), logPath: session.runnerLogPath },
+        });
+      });
+  } else {
+    await settleOwnedRunnerDeviceState(session, options);
+    if (session.xctestrunPath) cleanupTempFile(session.xctestrunPath);
+    if (session.jsonPath) cleanupTempFile(session.jsonPath);
+  }
   // The session's own resources are gone: no lease, no temp files.
   advanceRunnerSessionState(session, 'stopped');
 }
@@ -330,7 +370,8 @@ async function signalRunnerSessions(
 ): Promise<void> {
   await Promise.allSettled(
     activeSessions.map(async (session) => {
-      await killRunnerProcessTree(session.child.pid, signal);
+      if (session.launch) await session.launch.terminate();
+      else await killRunnerProcessTree(session.child?.pid, signal);
     }),
   );
 }

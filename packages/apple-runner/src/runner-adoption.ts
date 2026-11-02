@@ -115,7 +115,7 @@ export async function detachRunnerSessionsForShutdown(
         deviceId,
         lane: outcome.lane,
         sessionId: session.sessionId,
-        runnerPid: session.child.pid,
+        runnerPid: session.child?.pid,
         port: session.endpoint.port,
         runnerLogPath: session.runnerLogPath,
       },
@@ -149,7 +149,7 @@ function detachRunnerSessionForShutdown(session: RunnerSession): RunnerDetachOut
   if (!lease) {
     return { detached: false, lane, reason: 'lease_absent' };
   }
-  if (!isRunnerProcessAlive(session.child.pid)) {
+  if (!isRunnerProcessAlive(session.child?.pid)) {
     return { detached: false, lane, reason: 'runner_process_dead' };
   }
   try {

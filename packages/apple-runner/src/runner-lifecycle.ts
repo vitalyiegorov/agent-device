@@ -30,6 +30,7 @@ import {
 } from './runner-contract.ts';
 import {
   isRetryableRunnerError,
+  isRunnerForwardingUnavailable,
   isRunnerPreSendRefusal,
   isStructuredRunnerFailure,
   resolveFirstAttemptDispatch,
@@ -58,6 +59,8 @@ import {
   runnerRecycleLedgerKey,
   tryBeginRunnerRecycle,
 } from './runner-recycle-ledger.ts';
+
+import { isReadOnlyRunnerCommand } from './runner-command-traits.ts';
 
 export type PrepareIosRunnerOptions = AppleRunnerPrepareOptions;
 export type PrepareIosRunnerResult = AppleRunnerPrepareResult;
@@ -115,11 +118,13 @@ async function runPrepareAttempt(params: {
 }): Promise<PrepareAttemptResult> {
   const { device, command, options, signal, attempt, recoveryReason } = params;
   const connectStartedAt = Date.now();
+  assertRunnerStartAdmitsPreparation(device.id, options.startAdmission);
   const session = await ensureRunnerSession(device, {
     ...options,
     cleanStaleBundles: attempt > 1 ? true : options.cleanStaleBundles,
     ...readPrepareDeadlinePhaseTimeouts(options, 'runner_session'),
   });
+  assertExpectedRunnerSession(session, options.expectedRunnerSessionId);
   const connectMs = Date.now() - connectStartedAt;
   try {
     const result = await runPrepareHealthCheck(
@@ -158,11 +163,13 @@ async function handlePrepareHealthFailure(params: {
 }): Promise<PrepareAttemptResult> {
   const { device, session, command, options, signal, attempt, error } = params;
   assertRunnerStartAdmitsPreparation(device.id, options.startAdmission);
+  if (options.expectedRunnerSessionId !== undefined) throw error;
   const appErr = asAppError(error, 'COMMAND_FAILED');
   if (isRequestCanceledError(appErr)) {
     await invalidateRunnerSessionBestEffort(session, 'prepare_runner_request_canceled');
     throw error;
   }
+  if (isRunnerForwardingUnavailable(appErr)) throw error;
   if (attempt === 1 && shouldRecoverBadCachedRunnerArtifact(appErr, session)) {
     return {
       kind: 'prepared',
@@ -364,6 +371,8 @@ async function executeRunnerCommandAttempt(
         appErr,
       );
     }
+    const forwardingFailure = runnerForwardingFailureToRetain(appErr, command);
+    if (forwardingFailure) throw forwardingFailure;
     if (shouldRestartRunnerBeforeCommandSend(appErr, command) && session) {
       assertRunnerRequestActive(options.requestId);
       return await restartSessionAndRunCommand({
@@ -467,6 +476,9 @@ async function restartSessionAndRunCommand(params: {
     return recovered;
   } catch (error) {
     const retryAppErr = asAppError(error, 'COMMAND_FAILED');
+    const forwardingFailure = runnerForwardingFailureToRetain(retryAppErr, command);
+    if (forwardingFailure)
+      throw markRunnerRestartError(forwardingFailure, params, restartedSession);
     if (isRetryableRunnerError(retryAppErr) && !isStructuredRunnerFailure(retryAppErr)) {
       try {
         return await handleRunnerTransportErrorAfterCommandSend({
@@ -695,4 +707,13 @@ function emitPrepareDiagnostic(
       failureReason: result.failureReason,
     },
   });
+}
+
+function runnerForwardingFailureToRetain(
+  error: AppError,
+  command: RunnerCommand,
+): AppError | undefined {
+  if (!isRunnerForwardingUnavailable(error)) return;
+  if (error.details?.runnerReadinessPreflightFailed === true) return discloseDispatch(error, 'no');
+  if (isReadOnlyRunnerCommand(command)) return error;
 }

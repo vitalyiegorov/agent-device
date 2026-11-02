@@ -359,6 +359,20 @@ export const RUNNER_ERROR_RULES: readonly RunnerErrorRule[] = [
     verdicts: { retryable: false, connectRetry: false },
   },
   {
+    reason: 'runner_forwarding_unavailable',
+    match: {
+      code: 'COMMAND_FAILED',
+      details: (details) => details.reason === 'runner_forwarding_unavailable',
+    },
+    verdicts: {
+      retryable: true,
+      connectRetry: true,
+      restartBeforeSend: false,
+      restartAfterReadinessPreflight: false,
+      artifactSuspect: false,
+    },
+  },
+  {
     // The marker is the whole fact: the preflight gave up before the command was written, so
     // replaying it cannot duplicate anything. It is asked for alone because the preflight fails in
     // whatever shape the connect loop ended with — a refusal, an exhausted probe, a killed
@@ -655,6 +669,16 @@ export function isRetryableRunnerError(err: unknown): boolean {
   if (!(err instanceof AppError)) return false;
   if (err.code !== 'COMMAND_FAILED') return false;
   return runnerErrorVerdict(err, 'retryable') ?? false;
+}
+
+export function isRunnerForwardingUnavailable(
+  error: unknown,
+): error is AppError & { details: { reason: 'runner_forwarding_unavailable' } } {
+  return (
+    error instanceof AppError &&
+    error.code === 'COMMAND_FAILED' &&
+    error.details?.reason === 'runner_forwarding_unavailable'
+  );
 }
 
 /**

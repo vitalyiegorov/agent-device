@@ -1,3 +1,4 @@
+import type { RunnerLaunchObservation } from './runner-launcher.ts';
 import type { RunnerLogicalLeaseContext } from '@agent-device/contracts/runner-lease-context';
 import type { ExecResult } from '@agent-device/host-kit/command';
 import type { DeviceInfo } from '@agent-device/kernel/device';
@@ -64,17 +65,18 @@ export type RunnerSession = {
   device: DeviceInfo;
   deviceId: string;
   endpoint: RunnerEndpoint;
-  xctestrunPath: string;
+  xctestrunPath?: string;
   xctestrunArtifact?: RunnerXctestrunArtifact;
-  jsonPath: string;
+  jsonPath?: string;
   /**
    * Where this runner's own output goes: the file handed to the child as its stdout/stderr, which
    * the runner keeps appending to across a daemon handoff (#2681). A session adopted from an older
    * lease has none, because that runner wrote into pipes its own daemon held.
    */
   runnerLogPath?: string;
-  testPromise: Promise<ExecResult>;
-  child: RunnerProcessHandle;
+  testPromise?: Promise<ExecResult>;
+  child?: RunnerProcessHandle;
+  launch?: RunnerLaunchObservation;
   /**
    * Gives up this daemon's sides of the runner's log: the tail it follows and its copy of the log's
    * write end. Only a session this process launched has either. The runner keeps its own descriptor,
