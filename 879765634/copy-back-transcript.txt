@@ -1,0 +1,67 @@
+head=8797656349f1d837e5eb5276fa574c394b6d10fb host=macOS 15.7.4 xcode=Xcode 26.3 Build version 17C519 
+
+$ agent-device open com.apple.Preferences --platform ios --udid 45E52149-2CCB-4A67-A2F4-5D9710AF6D44 --session ev4184f --json
+{
+  "success": true,
+  "data": {
+    "session": "ev4184f",
+    "appName": "com.apple.Preferences",
+    "appBundleId": "com.apple.Preferences",
+    "selection": {
+      "reason": "explicit-selector",
+      "source": "local",
+      "candidateCount": 1,
+      "bootOccurred": false
+    },
+    "startup": {
+      "durationMs": 2940,
+      "measuredAt": "2026-11-04T17:52:58.820Z",
+      "method": "open-command-roundtrip",
+      "appTarget": "com.apple.Preferences",
+      "appBundleId": "com.apple.Preferences"
+    },
+    "platform": "ios",
+    "target": "mobile",
+    "device": "simlock-da275f3f-8573-447b-a230-77fb22fb8d2c",
+    "id": "45E52149-2CCB-4A67-A2F4-5D9710AF6D44",
+    "device_udid": "45E52149-2CCB-4A67-A2F4-5D9710AF6D44",
+    "ios_simulator_device_set": null,
+    "message": "Opened: com.apple.Preferences"
+  }
+}
+exit=0
+
+$ agent-device screenshot runner-1.png --capture-backend runner --platform ios --udid 45E52149-2CCB-4A67-A2F4-5D9710AF6D44 --session ev4184f
+<scratch>/out/runner-1.png (1206x2622 @1x)
+exit=0
+
+$ agent-device screenshot runner-2.png --capture-backend runner --platform ios --udid 45E52149-2CCB-4A67-A2F4-5D9710AF6D44 --session ev4184f
+<scratch>/out/runner-2.png (1206x2622 @1x)
+exit=0
+
+--- verify at the output path
+runner-1.png: PNG signature ok, all chunk CRCs ok, IHDR 1206x2622 depth 8 colortype 2, 9489018 scanline bytes decoded, 316041 file bytes, sha256 5cabcd261aea4769
+runner-2.png: PNG signature ok, all chunk CRCs ok, IHDR 1206x2622 depth 8 colortype 2, 9489018 scanline bytes decoded, 316041 file bytes, sha256 5cabcd261aea4769
+exit=0
+runner-1.png: PNG image data, 1206 x 2622, 8-bit/color RGB, non-interlaced
+  pixelWidth: 1206
+  pixelHeight: 2622
+
+--- runner.log
+2026-11-04 18:53:08.819876+0100 AGENT_DEVICE_RUNNER_COMMAND_ACCEPTED command=screenshot commandId=runner-25c65547-e835-4438-b454-7012a13610aa
+2026-11-04 18:53:08.973118+0100 AGENT_DEVICE_RUNNER_COMMAND_COMPLETED command=screenshot commandId=runner-25c65547-e835-4438-b454-7012a13610aa ok=1
+2026-11-04 18:53:09.235765+0100 AGENT_DEVICE_RUNNER_COMMAND_ACCEPTED command=screenshot commandId=runner-98acdb4c-c799-43d5-8d43-55b263668e11
+2026-11-04 18:53:09.336634+0100 AGENT_DEVICE_RUNNER_COMMAND_COMPLETED command=screenshot commandId=runner-98acdb4c-c799-43d5-8d43-55b263668e11 ok=1
+
+$ agent-device close --platform ios --udid 45E52149-2CCB-4A67-A2F4-5D9710AF6D44 --session ev4184f
+Closed: ev4184f
+exit=0
+
+$ agent-device session list --json
+{
+  "success": true,
+  "data": {
+    "sessions": []
+  }
+}
+exit=0

@@ -1,0 +1,6 @@
+state: granted
+{"platform":"ios","device":"iPhone 17 Pro","os":"26.2","udid":"45E52149-2CCB-4A67-A2F4-5D9710AF6D44","mode":"slim","expiresAt":"2026-11-04T18:02:54.407Z"}
+lease start 17:52:54
+lease end 17:53:09
+release: 202
+leases held by this token: 0
