@@ -1,0 +1,263 @@
+parser-test-ok
+token id: tok_4785b450-88a4-470d-ba36-50a93134ec91
+gateway: https://simlock.vitaliiyehorov.dev/v1/agent-device, reached through a local logging relay on 127.0.0.1:47312 so the RPC can be recorded
+
+$ agent-device connect proxy --daemon-base-url http://127.0.0.1:47312/v1/agent-device --json
+{
+  "success": true,
+  "data": {
+    "connected": true,
+    "session": "ev4183",
+    "tenant": "proxy",
+    "runId": "proxy-b66ede479abcb980",
+    "leaseAllocated": false,
+    "leaseProvider": "proxy",
+    "remoteConfig": "<scratch>/tmp.9KtEColcz1/remote-connections/generated/proxy-a6676911084b654e.json",
+    "remoteConfigHash": "7851012e54920ccd7731f1baecce663321e53f315f09cbd12d41ddbd94000887",
+    "daemonBaseUrlFingerprint": "b938935bb6dd",
+    "liveSession": {
+      "status": "not-created"
+    },
+    "verification": {
+      "status": "configured",
+      "service": "Agent Device Proxy",
+      "message": "Proxy configuration saved. Access is checked by the first remote command."
+    },
+    "nextSteps": [
+      "agent-device devices --session ev4183",
+      "agent-device open <package-id> --relaunch --session ev4183"
+    ],
+    "metro": {
+      "prepared": false
+    },
+    "leasePreparation": {
+      "status": "deferred",
+      "nextSteps": [
+        "agent-device devices --session ev4183",
+        "agent-device open <package-id> --relaunch --session ev4183"
+      ],
+      "message": "No live device session has been created. Run devices to inspect inventory without allocating, then open when ready."
+    },
+    "connectedAt": "2026-11-04T09:12:58.951Z",
+    "updatedAt": "2026-11-04T09:12:58.951Z"
+  }
+}
+exit=0
+
+$ agent-device open com.apple.Passbook --platform ios --device iPhone 17 Pro --device-mode full --json
+{
+  "success": true,
+  "data": {
+    "session": "ev4183",
+    "sessionStateDir": "/Users/macstudio/.simlock/agent-device/sessions/gw.87660ff9-8284-4091-a879-db83ad202b6f.tok_5f_4785b450-88a4-470d-ba36-50a93134ec91_ev4183",
+    "runnerLogPath": "/Users/macstudio/.simlock/agent-device/sessions/gw.87660ff9-8284-4091-a879-db83ad202b6f.tok_5f_4785b450-88a4-470d-ba36-50a93134ec91_ev4183/runner.log",
+    "requestLogPath": "/Users/macstudio/.simlock/agent-device/sessions/gw.87660ff9-8284-4091-a879-db83ad202b6f.tok_5f_4785b450-88a4-470d-ba36-50a93134ec91_ev4183/requests/f39cba3abc90db2f.ndjson",
+    "eventLogPath": "/Users/macstudio/.simlock/agent-device/sessions/gw.87660ff9-8284-4091-a879-db83ad202b6f.tok_5f_4785b450-88a4-470d-ba36-50a93134ec91_ev4183/events.ndjson",
+    "appName": "com.apple.Passbook",
+    "appBundleId": "com.apple.Passbook",
+    "selection": {
+      "reason": "explicit-selector",
+      "source": "local",
+      "candidateCount": 1,
+      "bootOccurred": false
+    },
+    "startup": {
+      "durationMs": 5332,
+      "measuredAt": "2026-11-04T09:13:30.546Z",
+      "method": "open-command-roundtrip",
+      "appTarget": "com.apple.Passbook",
+      "appBundleId": "com.apple.Passbook"
+    },
+    "platform": "ios",
+    "target": "mobile",
+    "device": "simlock-0ba52684-b744-48f1-b104-3fb4b7aa10b6",
+    "id": "8C5BE9FB-A00B-49F5-B6D8-86302DCA1635",
+    "device_udid": "8C5BE9FB-A00B-49F5-B6D8-86302DCA1635",
+    "ios_simulator_device_set": null,
+    "message": "Opened: com.apple.Passbook",
+    "lease": {
+      "device": {
+        "model": "iPhone 17 Pro",
+        "osVersion": "26.2",
+        "physical": false
+      }
+    }
+  }
+}
+exit=0
+
+--- farm lease list count: 1  id: d900fb6a2afcee6d48b44acb5092a861
+--- farm's record of the lease (GET /v1/leases/<id>)
+{"id":"d900fb6a2afcee6d48b44acb5092a861","platform":"ios","device":"iPhone 17 Pro","os":"26.2","udid":"8C5BE9FB-A00B-49F5-B6D8-86302DCA1635","mode":"full","requestId":"req_590904b0-fbe2-40a1-81f4-159a7a46148e"}
+
+--- simctl spawn launchctl print-disabled system (POST /v1/leases/<id>/exec)
+disabled launchd labels: 0
+com.apple.passd entry: 
+
+--- simctl spawn launchctl print system/com.apple.passd (POST /v1/leases/<id>/exec)
+	state = running
+	program = /Library/Developer/CoreSimulator/Volumes/iOS_23C54/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.2
+	pid = 16682
+	job state = running
+
+$ agent-device screenshot <scratch>/wallet.png --json
+{
+  "success": true,
+  "data": {
+    "path": "<scratch>/wallet.png",
+    "width": 402,
+    "height": 874,
+    "logicalWidth": 402,
+    "logicalHeight": 874,
+    "pixelDensity": 1
+  }
+}
+exit=0
+
+$ agent-device snapshot -i --json
+{
+  "success": true,
+  "data": {
+    "nodes": [
+      {
+        "depth": 0,
+        "hittable": false,
+        "label": "Allow “Wallet” to use your location?",
+        "enabled": true,
+        "index": 0,
+        "type": "Alert",
+        "rect": {
+          "height": 346,
+          "x": 41,
+          "width": 320,
+          "y": 278
+        },
+        "ref": "e1",
+        "kind": "alert"
+      },
+      {
+        "label": "Allow Once",
+        "parentIndex": 0,
+        "enabled": true,
+        "rect": {
+          "x": 57,
+          "y": 448,
+          "width": 288,
+          "height": 48
+        },
+        "depth": 1,
+        "type": "Button",
+        "hittable": true,
+        "index": 1,
+        "ref": "e2",
+        "kind": "button"
+      },
+      {
+        "depth": 1,
+        "parentIndex": 0,
+        "rect": {
+          "x": 57,
+          "y": 504,
+          "width": 288,
+          "height": 48
+        },
+        "hittable": true,
+        "type": "Button",
+        "index": 2,
+        "enabled": true,
+        "label": "Allow While Using App",
+        "ref": "e3",
+        "kind": "button"
+      },
+      {
+        "parentIndex": 0,
+        "index": 3,
+        "enabled": true,
+        "label": "Don’t Allow",
+        "rect": {
+          "x": 57,
+          "y": 560,
+          "width": 288,
+          "height": 48
+        },
+        "depth": 1,
+        "type": "Button",
+        "hittable": true,
+        "ref": "e4",
+        "kind": "button"
+      },
+      {
+        "type": "StaticText",
+        "enabled": true,
+        "hittable": false,
+        "index": 4,
+        "depth": 1,
+        "parentIndex": 0,
+        "rect": {
+          "x": 71,
+          "y": 300,
+          "width": 260,
+          "height": 42.333333333333314
+        },
+        "ref": "e5",
+        "kind": "text",
+        "inheritsLabel": true
+      },
+      {
+        "type": "StaticText",
+        "enabled": true,
+        "rect": {
+          "x": 71,
+          "y": 349.6666666666667,
+          "width": 260,
+          "height": 78
+        },
+        "depth": 1,
+        "hittable": false,
+        "index": 5,
+        "parentIndex": 0,
+        "label": "Your location is used to show relevant passes, set up Apple Pay, improve transaction details, and prevent fraud.",
+        "ref": "e6",
+        "kind": "text"
+      }
+    ],
+    "truncated": false,
+    "appName": "com.apple.Passbook",
+    "appBundleId": "com.apple.Passbook",
+    "visibility": {
+      "partial": false,
+      "visibleNodeCount": 6,
+      "totalNodeCount": 6,
+      "reasons": []
+    },
+    "viewport": {
+      "width": 320,
+      "height": 346
+    },
+    "presentedSurface": "presented",
+    "warnings": [
+      "Simulator AX snapshot unavailable (foreground-owner-unverified); used XCTest for this capture, while another surface owned the foreground."
+    ],
+    "snapshotDiagnostics": {
+      "stats": {
+        "count": 2,
+        "p50Ms": 1662,
+        "p95Ms": 7547,
+        "maxMs": 7547,
+        "slowThresholdMs": 1500,
+        "platform": "ios",
+        "backends": {
+          "xctest": 2
+        }
+      }
+    },
+    "refsGeneration": 480635
+  }
+}
+exit=0
+
+--- cleanup
+  "success": true,
+  "success": true,
+leases held by this token: 0
+{"revoked":true}

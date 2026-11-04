@@ -1,0 +1,77 @@
+
+########## STUB GATEWAY (127.0.0.1, not simlock), allocation reports reused=false, deviceMode=slim
+
+$ agent-device connect proxy --daemon-base-url http://127.0.0.1:47311/agent-device
+Configured successfully with Agent Device Proxy.
+Status: Proxy configuration saved. Access is checked by the first remote command.
+No live device session has been created. Run devices to inspect inventory without allocating, then open when ready.
+Next:
+  agent-device devices --session stubowned
+  agent-device open <package-id> --relaunch --session stubowned
+exit=0
+
+$ agent-device open com.example.app --platform ios --device-mode full --json
+{
+  "success": false,
+  "error": {
+    "code": "UNSUPPORTED_OPERATION",
+    "message": "The proxy backend leased a device without confirming the requested device spec.",
+    "hint": "Drop --os, --image-tag, --device-mode and --physical, or connect through a proxy whose backend picks devices by spec.",
+    "diagnosticId": "mw1wfba1-28ec11e2",
+    "logPath": "~/.agent-device/logs/stubowned/2026-11-04/2026-11-04T09-12-53-368Z-mw1wfba1-28ec11e2.ndjson",
+    "details": {
+      "session": "stubowned",
+      "leaseId": "d82f89eb93b4d7e9bf580babb7a390e7",
+      "reason": "device-spec-unsupported",
+      "keys": [
+        "deviceMode"
+      ],
+      "released": true
+    }
+  }
+}
+exit=1
+
+--- RPC seen by the STUB
+{"dir":"start","mode":"stub","upstream":"none: STUB"}
+{"dir":"client->STUB","method":"agent_device.lease.allocate","params":{"session":"stubowned","tenantId":"proxy","runId":"proxy-71ab8cfa88fb26eb","leaseProvider":"proxy","clientId":"71ab8cfa88fb26eb","leaseId":"d82f89eb93b4d7e9bf580babb7a390e7","ttlMs":300000,"backend":"ios-instance","platform":"ios","deviceMode":"full"}}
+{"dir":"STUB->client","method":"agent_device.lease.allocate","result":{"ok":true,"data":{"lease":{"leaseId":"d82f89eb93b4d7e9bf580babb7a390e7","tenantId":"proxy","runId":"proxy-71ab8cfa88fb26eb","backend":"ios-instance","deviceKey":"ios:mobile:STUB-SIMULATOR-UDID","device":{"model":"iPhone 17 Pro","osVersion":"26.2","physical":false,"deviceMode":"slim"}},"reused":false}}}
+{"dir":"client->STUB","method":"agent_device.lease.release","params":{"session":"stubowned","tenantId":"proxy","runId":"proxy-71ab8cfa88fb26eb","leaseProvider":"proxy","clientId":"71ab8cfa88fb26eb","deviceKey":"ios:mobile:STUB-SIMULATOR-UDID","leaseId":"d82f89eb93b4d7e9bf580babb7a390e7"}}
+{"dir":"STUB->client","method":"agent_device.lease.release","result":{"ok":true,"data":{"released":true}}}
+
+########## STUB GATEWAY (127.0.0.1, not simlock), allocation reports reused=true, deviceMode=slim
+
+$ agent-device connect proxy --daemon-base-url http://127.0.0.1:47311/agent-device
+Configured successfully with Agent Device Proxy.
+Status: Proxy configuration saved. Access is checked by the first remote command.
+No live device session has been created. Run devices to inspect inventory without allocating, then open when ready.
+Next:
+  agent-device devices --session stubreused
+  agent-device open <package-id> --relaunch --session stubreused
+exit=0
+
+$ agent-device open com.example.app --platform ios --device-mode full --json
+{
+  "success": false,
+  "error": {
+    "code": "UNSUPPORTED_OPERATION",
+    "message": "The proxy backend leased a device without confirming the requested device spec.",
+    "hint": "Drop --os, --image-tag, --device-mode and --physical, or connect through a proxy whose backend picks devices by spec.",
+    "diagnosticId": "mw1wfcxy-cf7506f4",
+    "logPath": "~/.agent-device/logs/stubreused/2026-11-04/2026-11-04T09-12-55-495Z-mw1wfcxy-cf7506f4.ndjson",
+    "details": {
+      "session": "stubreused",
+      "leaseId": "93782217c3d16dfacd4babc203411811",
+      "reason": "device-spec-unsupported",
+      "keys": [
+        "deviceMode"
+      ]
+    }
+  }
+}
+exit=1
+
+--- RPC seen by the STUB
+{"dir":"start","mode":"stub","upstream":"none: STUB"}
+{"dir":"client->STUB","method":"agent_device.lease.allocate","params":{"session":"stubreused","tenantId":"proxy","runId":"proxy-88e56829493648df","leaseProvider":"proxy","clientId":"88e56829493648df","leaseId":"93782217c3d16dfacd4babc203411811","ttlMs":300000,"backend":"ios-instance","platform":"ios","deviceMode":"full"}}
+{"dir":"STUB->client","method":"agent_device.lease.allocate","result":{"ok":true,"data":{"lease":{"leaseId":"93782217c3d16dfacd4babc203411811","tenantId":"proxy","runId":"proxy-88e56829493648df","backend":"ios-instance","deviceKey":"ios:mobile:STUB-SIMULATOR-UDID","device":{"model":"iPhone 17 Pro","osVersion":"26.2","physical":false,"deviceMode":"slim"}},"reused":true}}}
