@@ -1,0 +1,16 @@
+# ADMISSION BOUNDARY, NOT A LIVE PROVIDER RUN. No Limrun or Revyl account is available.
+# The test binds the real bindLimrunInteractionOperations for an iOS device, with a fake interactor.
+
+## RED: admission and the Limrun binding as at 19a14237a98a88a6c671fd87c892c2755aad1233, this head's test
+AssertionError: promise resolved "{}" instead of rejecting
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |unit-core| packages/provider-limrun/src/interaction-operations.test.ts > a provider iOS capture refuses an explicit runner request instead of returning a provider
+      Tests  1 failed | 12 skipped (13)
+
+## GREEN: 9feb2693639796426a67ae0780bf393639edf2f1
+ ✓ |unit-core| packages/contracts/src/screenshot-runtime.test.ts > an owner declaring no capture backend refuses an explicit one with its own explanation
+ ✓ |unit-core| packages/contracts/src/screenshot-runtime.test.ts > an owner declaring no capture backend refuses an explicit one with its own explanation
+ ✓ |unit-core| packages/contracts/src/screenshot-runtime.test.ts > a preferred backend selects a declared one and otherwise keeps the default capture: ["runner"]
+ ✓ |unit-core| packages/contracts/src/screenshot-runtime.test.ts > a preferred backend selects a declared one and otherwise keeps the default capture: []
+ ✓ |unit-core| packages/provider-limrun/src/interaction-operations.test.ts > a provider iOS capture refuses an explicit runner request instead of returning a provider scr
+      Tests  23 passed (23)
