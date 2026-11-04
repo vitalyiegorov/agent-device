@@ -1,0 +1,73 @@
+head=58d7bd8ecd4dd41e76d5b1cac84751fa38bd2b0c host=macOS 15.7.4
+
+$ agent-device open com.android.settings --platform android --serial emulator-5588 --session ev4184a --json
+{
+  "success": true,
+  "data": {
+    "session": "ev4184a",
+    "sessionStateDir": "<scratch>/state-android/sessions/ev4184a",
+    "runnerLogPath": "<scratch>/state-android/sessions/ev4184a/runner.log",
+    "requestLogPath": "<scratch>/state-android/sessions/ev4184a/requests/77084b4e098ba12e.ndjson",
+    "eventLogPath": "<scratch>/state-android/sessions/ev4184a/events.ndjson",
+    "appName": "com.android.settings",
+    "appBundleId": "com.android.settings",
+    "selection": {
+      "reason": "explicit-selector",
+      "source": "local",
+      "candidateCount": 1,
+      "bootOccurred": false
+    },
+    "startup": {
+      "durationMs": 1729,
+      "measuredAt": "2026-11-04T11:01:48.874Z",
+      "method": "open-command-roundtrip",
+      "appTarget": "com.android.settings",
+      "appBundleId": "com.android.settings"
+    },
+    "platform": "android",
+    "target": "mobile",
+    "device": "simlock 2fd6abf8-9c88-43c8-a31e-fd137d81f5a2",
+    "id": "emulator-5588",
+    "serial": "emulator-5588",
+    "message": "Opened: com.android.settings"
+  }
+}
+exit=0
+
+$ agent-device screenshot refused-android.png --capture-backend runner --platform android --serial emulator-5588 --session ev4184a --json
+{
+  "success": false,
+  "error": {
+    "code": "UNSUPPORTED_OPERATION",
+    "message": "--capture-backend runner is not supported: an Android device captures through adb",
+    "hint": "This command is not available for the selected platform/device.",
+    "diagnosticId": "mw20bec2-76b347ca",
+    "logPath": "<scratch>/state-android/sessions/ev4184a/requests/564cb309028a8363.ndjson",
+    "diagnosticsRecord": {
+      "session": "ev4184a",
+      "requestId": "564cb309028a8363"
+    },
+    "details": {
+      "reason": "screenshot-capture-backend-unsupported",
+      "dispatched": "no"
+    }
+  }
+}
+exit=1
+
+$ ls refused-android.png
+ls: refused-android.png: No such file or directory
+exit=1
+
+$ agent-device close --platform android --serial emulator-5588 --session ev4184a
+Closed: ev4184a
+exit=0
+
+$ agent-device session list --json
+{
+  "success": true,
+  "data": {
+    "sessions": []
+  }
+}
+exit=0

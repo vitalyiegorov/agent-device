@@ -1,0 +1,43 @@
+head=58d7bd8ecd4dd41e76d5b1cac84751fa38bd2b0c host=macOS 15.7.4 xcode=Xcode 26.3 Build version 17C519 
+
+--- comparison.flow.yaml
+appId: com.apple.Preferences
+---
+- launchApp
+- waitForAnimationToEnd
+
+$ agent-device replay comparison.flow.yaml --maestro --platform ios --udid DC15C8A1-C24E-46CA-9D40-78307E45406E --session ev4184m --debug --json
+{
+  "success": true,
+  "data": {
+    "replayed": 2,
+    "healed": 0,
+    "session": "ev4184m",
+    "sessionActive": true,
+    "artifactPaths": [],
+    "message": "Replayed 2 steps in 8.1s This session's daemon was kept alive because its script left the session active; pass --session ev4184m on your next command to reach it.",
+    "hint": "This session's daemon was kept alive because its script left the session active; pass --session ev4184m on your next command to reach it."
+  }
+}
+exit=0
+
+$ agent-device screenshot control-default.png --platform ios --udid DC15C8A1-C24E-46CA-9D40-78307E45406E --session ev4184m --debug
+<scratch>/out/control-default.png (402x874 @1x)
+exit=0
+
+$ agent-device screenshot control-runner.png --capture-backend runner --platform ios --udid DC15C8A1-C24E-46CA-9D40-78307E45406E --session ev4184m --debug
+<scratch>/out/control-runner.png (1206x2622 @1x)
+exit=0
+
+$ agent-device close --platform ios --udid DC15C8A1-C24E-46CA-9D40-78307E45406E --session ev4184m
+Closed: ev4184m
+exit=0
+
+$ agent-device session list --json
+{
+  "success": true,
+  "data": {
+    "sessions": []
+  }
+}
+exit=0

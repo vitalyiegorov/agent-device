@@ -1,0 +1,4 @@
+state: granted
+{"platform":"ios","device":"iPhone 17 Pro","os":"26.2","imageTag":null,"address":"DC15C8A1-C24E-46CA-9D40-78307E45406E","udid":"DC15C8A1-C24E-46CA-9D40-78307E45406E","mode":"slim","expiresAt":"2026-11-04T11:11:59.516Z"}
+release: 202
+leases held by this token: 0

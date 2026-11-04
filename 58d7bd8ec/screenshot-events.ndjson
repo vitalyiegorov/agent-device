@@ -1,0 +1,8 @@
+{"version":1,"ts":"2026-11-04T11:02:04.653Z","session":"ev4184m","kind":"request.started","requestId":"7d3aadc9e6d37ce4","command":"screenshot","summary":"Started screenshot"}
+{"version":1,"ts":"2026-11-04T11:02:09.649Z","session":"ev4184m","kind":"request.finished","requestId":"7d3aadc9e6d37ce4","command":"screenshot","status":"ok","summary":"Finished screenshot","details":{"durationMs":4996,"requestedFileName":"first.png"}}
+{"version":1,"ts":"2026-11-04T11:02:09.650Z","session":"ev4184m","kind":"request.started","requestId":"7d3aadc9e6d37ce4","command":"screenshot","summary":"Started screenshot"}
+{"version":1,"ts":"2026-11-04T11:02:09.766Z","session":"ev4184m","kind":"request.finished","requestId":"7d3aadc9e6d37ce4","command":"screenshot","status":"ok","summary":"Finished screenshot","details":{"durationMs":116,"requestedFileName":"second.png"}}
+{"version":1,"ts":"2026-11-04T11:02:09.949Z","session":"ev4184m","kind":"request.started","requestId":"e019579f2ab3b4af","command":"screenshot","summary":"Started screenshot"}
+{"version":1,"ts":"2026-11-04T11:02:10.360Z","session":"ev4184m","kind":"request.finished","requestId":"e019579f2ab3b4af","command":"screenshot","status":"ok","summary":"Finished screenshot","details":{"durationMs":410,"requestedFileName":"control-default.png"
+{"version":1,"ts":"2026-11-04T11:02:10.485Z","session":"ev4184m","kind":"request.started","requestId":"67747ba866bd69d4","command":"screenshot","summary":"Started screenshot"}
+{"version":1,"ts":"2026-11-04T11:02:10.645Z","session":"ev4184m","kind":"request.finished","requestId":"67747ba866bd69d4","command":"screenshot","status":"ok","summary":"Finished screenshot","details":{"durationMs":160,"requestedFileName":"control-runner.png"}
