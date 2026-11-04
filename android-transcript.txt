@@ -1,0 +1,72 @@
+head=19a14237a98a88a6c671fd87c892c2755aad1233 host=macOS 15.7.4
+
+$ agent-device open com.android.settings --platform android --serial emulator-5586 --session ev4184a --json
+{
+  "success": true,
+  "data": {
+    "session": "ev4184a",
+    "sessionStateDir": "/private/tmp/ad-4184a/state/sessions/ev4184a",
+    "runnerLogPath": "/private/tmp/ad-4184a/state/sessions/ev4184a/runner.log",
+    "requestLogPath": "/private/tmp/ad-4184a/state/sessions/ev4184a/requests/c59dbb65e16c3122.ndjson",
+    "eventLogPath": "/private/tmp/ad-4184a/state/sessions/ev4184a/events.ndjson",
+    "appName": "com.android.settings",
+    "appBundleId": "com.android.settings",
+    "selection": {
+      "reason": "explicit-selector",
+      "source": "local",
+      "candidateCount": 1,
+      "bootOccurred": false
+    },
+    "startup": {
+      "durationMs": 1937,
+      "measuredAt": "2026-11-04T07:48:18.847Z",
+      "method": "open-command-roundtrip",
+      "appTarget": "com.android.settings",
+      "appBundleId": "com.android.settings"
+    },
+    "platform": "android",
+    "target": "mobile",
+    "device": "simlock e1ee9c9f-e92e-4b26-8b28-66b884a52fe6",
+    "id": "emulator-5586",
+    "serial": "emulator-5586",
+    "message": "Opened: com.android.settings"
+  }
+}
+exit=0
+
+$ agent-device screenshot refused-android.png --capture-backend runner --platform android --serial emulator-5586 --session ev4184a --json
+{
+  "success": false,
+  "error": {
+    "code": "UNSUPPORTED_OPERATION",
+    "message": "--capture-backend runner is supported only on Apple targets",
+    "hint": "This command is not available for the selected platform/device.",
+    "diagnosticId": "mw1tejzi-17b53e9a",
+    "logPath": "/private/tmp/ad-4184a/state/sessions/ev4184a/requests/e0ae477fef64107f.ndjson",
+    "diagnosticsRecord": {
+      "session": "ev4184a",
+      "requestId": "e0ae477fef64107f"
+    },
+    "details": {
+      "dispatched": "no"
+    }
+  }
+}
+exit=1
+
+$ ls refused-android.png
+ls: refused-android.png: No such file or directory
+exit=1
+
+$ agent-device close --platform android --serial emulator-5586 --session ev4184a
+Closed: ev4184a
+exit=0
+
+$ agent-device session list --json
+{
+  "success": true,
+  "data": {
+    "sessions": []
+  }
+}
+exit=0
