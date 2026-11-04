@@ -1,0 +1,151 @@
+head=19a14237a98a88a6c671fd87c892c2755aad1233 host=macOS 15.7.4 xcode=Xcode 26.3 Build version 17C519 
+
+$ agent-device open com.apple.Preferences --platform ios --udid 451B7FE2-1B27-49DC-8E5F-81089342CD26 --session ev4184 --json
+{
+  "success": true,
+  "data": {
+    "session": "ev4184",
+    "sessionStateDir": "/private/tmp/ad-4184/state/sessions/ev4184",
+    "runnerLogPath": "/private/tmp/ad-4184/state/sessions/ev4184/runner.log",
+    "requestLogPath": "/private/tmp/ad-4184/state/sessions/ev4184/requests/ae1e8ebc38cdde6a.ndjson",
+    "eventLogPath": "/private/tmp/ad-4184/state/sessions/ev4184/events.ndjson",
+    "appName": "com.apple.Preferences",
+    "appBundleId": "com.apple.Preferences",
+    "selection": {
+      "reason": "explicit-selector",
+      "source": "local",
+      "candidateCount": 1,
+      "bootOccurred": false
+    },
+    "startup": {
+      "durationMs": 2283,
+      "measuredAt": "2026-11-04T06:58:08.798Z",
+      "method": "open-command-roundtrip",
+      "appTarget": "com.apple.Preferences",
+      "appBundleId": "com.apple.Preferences"
+    },
+    "platform": "ios",
+    "target": "mobile",
+    "device": "simlock-38b595f2-fa94-4635-9bc3-074c8886fa83",
+    "id": "451B7FE2-1B27-49DC-8E5F-81089342CD26",
+    "device_udid": "451B7FE2-1B27-49DC-8E5F-81089342CD26",
+    "ios_simulator_device_set": null,
+    "message": "Opened: com.apple.Preferences"
+  }
+}
+exit=0
+
+$ agent-device screenshot default.png --platform ios --udid 451B7FE2-1B27-49DC-8E5F-81089342CD26 --session ev4184
+/private/tmp/ad-4184/out/default.png (402x874 @1x)
+exit=0
+
+$ agent-device screenshot runner.png --capture-backend runner --platform ios --udid 451B7FE2-1B27-49DC-8E5F-81089342CD26 --session ev4184
+/private/tmp/ad-4184/out/runner.png (1206x2622 @1x)
+exit=0
+
+$ agent-device screenshot refused-density.png --capture-backend runner --pixel-density 3 --platform ios --udid 451B7FE2-1B27-49DC-8E5F-81089342CD26 --session ev4184 --json
+{
+  "success": false,
+  "error": {
+    "code": "INVALID_ARGS",
+    "message": "--pixel-density and --normalize-status-bar cannot be combined with --capture-backend runner: they belong to the simctl capture",
+    "hint": "Check command arguments and run --help for usage examples.",
+    "diagnosticId": "mw1rm4da-006aeadc",
+    "logPath": "/private/tmp/ad-4184/state/sessions/ev4184/requests/665bfa7b48f3c81a.ndjson",
+    "diagnosticsRecord": {
+      "session": "ev4184",
+      "requestId": "665bfa7b48f3c81a"
+    },
+    "details": {
+      "dispatched": "no"
+    }
+  }
+}
+exit=1
+
+$ agent-device screenshot refused-statusbar.png --capture-backend runner --normalize-status-bar --platform ios --udid 451B7FE2-1B27-49DC-8E5F-81089342CD26 --session ev4184 --json
+{
+  "success": false,
+  "error": {
+    "code": "INVALID_ARGS",
+    "message": "--pixel-density and --normalize-status-bar cannot be combined with --capture-backend runner: they belong to the simctl capture",
+    "hint": "Check command arguments and run --help for usage examples.",
+    "diagnosticId": "mw1rm4ge-c9e888e6",
+    "logPath": "/private/tmp/ad-4184/state/sessions/ev4184/requests/323f8c49e8530932.ndjson",
+    "diagnosticsRecord": {
+      "session": "ev4184",
+      "requestId": "323f8c49e8530932"
+    },
+    "details": {
+      "dispatched": "no"
+    }
+  }
+}
+exit=1
+
+$ agent-device close --platform ios --udid 451B7FE2-1B27-49DC-8E5F-81089342CD26 --session ev4184
+Closed: ev4184
+exit=0
+
+$ agent-device session list --json
+{
+  "success": true,
+  "data": {
+    "sessions": []
+  }
+}
+exit=0
+
+$ agent-device open --surface desktop --platform macos --session ev4184mac --json
+{
+  "success": true,
+  "data": {
+    "session": "ev4184mac",
+    "sessionStateDir": "/private/tmp/ad-4184/state/sessions/ev4184mac",
+    "runnerLogPath": "/private/tmp/ad-4184/state/sessions/ev4184mac/runner.log",
+    "requestLogPath": "/private/tmp/ad-4184/state/sessions/ev4184mac/requests/e3c8f12b94cd5303.ndjson",
+    "eventLogPath": "/private/tmp/ad-4184/state/sessions/ev4184mac/events.ndjson",
+    "selection": {
+      "reason": "single-booted-local",
+      "source": "local",
+      "candidateCount": 1,
+      "bootOccurred": false
+    },
+    "platform": "macos",
+    "target": "desktop",
+    "device": "vitaliiacstudio.localdomain",
+    "id": "host-macos-local",
+    "message": "Opened: ev4184mac"
+  }
+}
+exit=0
+
+$ agent-device screenshot refused-macos.png --capture-backend runner --platform macos --session ev4184mac --json
+{
+  "success": false,
+  "error": {
+    "code": "UNSUPPORTED_OPERATION",
+    "message": "--capture-backend runner cannot capture this surface: the macOS helper owns it",
+    "hint": "This command is not available for the selected platform/device.",
+    "diagnosticId": "mw1rm4t3-92257e17",
+    "logPath": "/private/tmp/ad-4184/state/sessions/ev4184mac/requests/f4d19dd857f8d6af.ndjson",
+    "diagnosticsRecord": {
+      "session": "ev4184mac",
+      "requestId": "f4d19dd857f8d6af"
+    },
+    "details": {
+      "reason": "screenshot-capture-backend-unsupported",
+      "dispatched": "no"
+    }
+  }
+}
+exit=1
+
+$ agent-device close --platform macos --session ev4184mac
+Closed: ev4184mac
+exit=0
+total 744
+drwxr-xr-x  4 macstudio  wheel     128 Nov  4 07:58 .
+drwxr-xr-x  9 macstudio  wheel     288 Nov  4 07:58 ..
+-rw-r--r--@ 1 macstudio  wheel   58905 Nov  4 07:58 default.png
+-rw-r--r--@ 1 macstudio  staff  316143 Nov  4 07:58 runner.png
